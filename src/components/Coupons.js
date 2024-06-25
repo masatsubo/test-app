@@ -1,4 +1,5 @@
-// components/Coupons.js
+// src/components/Coupons.js
+
 import React from 'react';
 
 function Coupons() {
