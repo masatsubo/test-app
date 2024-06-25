@@ -1,4 +1,5 @@
-// components/AIAssistant.js
+// src/components/AIAssistant.js
+
 import React, { useState } from 'react';
 
 function AIAssistant() {
@@ -7,10 +8,22 @@ function AIAssistant() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // AIの応答をシミュレート
-    const aiResponse = "申し訳ありませんが、これはモックアプリです。実際のAI応答は実装されていません。";
+    const aiResponse = generateAIResponse(message);
     setConversation([...conversation, { user: message, ai: aiResponse }]);
     setMessage('');
+  };
+
+  const generateAIResponse = (userMessage) => {
+    // 簡単なキーワードベースの応答生成
+    if (userMessage.includes('魚')) {
+      return '角上魚類では、新鮮な魚を豊富に取り揃えています。本日のおすすめは季節の旬の魚です。';
+    } else if (userMessage.includes('営業時間')) {
+      return '通常の営業時間は午前9時から午後8時までです。詳細は各店舗にお問い合わせください。';
+    } else if (userMessage.includes('特売')) {
+      return '毎週水曜日は特売日です。その日の朝に特売情報をお知らせしています。';
+    } else {
+      return 'ご質問ありがとうございます。具体的な情報については、お近くの角上魚類の店舗にお問い合わせください。';
+    }
   };
 
   return (

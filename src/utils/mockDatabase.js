@@ -2,7 +2,6 @@
 
 const STORAGE_KEY = 'kakujoe_db';
 
-// データベースの初期化
 const initDB = () => {
   if (!localStorage.getItem(STORAGE_KEY)) {
     const initialData = {
@@ -18,31 +17,26 @@ const initDB = () => {
   }
 };
 
-// データの取得
 const getAll = () => {
   return JSON.parse(localStorage.getItem(STORAGE_KEY));
 };
 
-// データの保存
 const saveAll = (data) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 };
 
-// ユーザーの追加
 const addUser = (user) => {
   const data = getAll();
   data.users.push(user);
   saveAll(data);
 };
 
-// お気に入りの追加
 const addFavorite = (userId, storeId) => {
   const data = getAll();
   data.favorites.push({ userId, storeId });
   saveAll(data);
 };
 
-// 店舗の混雑状況更新
 const updateStoreCrowdedness = (storeId, crowdedness) => {
   const data = getAll();
   const store = data.stores.find(s => s.id === storeId);
@@ -52,7 +46,11 @@ const updateStoreCrowdedness = (storeId, crowdedness) => {
   }
 };
 
-// データベースの初期化
+const getUserFavorites = (userId) => {
+  const data = getAll();
+  return data.favorites.filter(fav => fav.userId === userId).map(fav => fav.storeId);
+};
+
 initDB();
 
 export const db = {
@@ -60,4 +58,5 @@ export const db = {
   addUser,
   addFavorite,
   updateStoreCrowdedness,
+  getUserFavorites,
 };
