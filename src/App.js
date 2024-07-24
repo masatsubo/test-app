@@ -1,83 +1,58 @@
-// src/App.js
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import { db } from './utils/mockDatabase';
-import './styles.css';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
+import { Home as HomeIcon, Chat as ChatIcon, Store as StoreIcon, LocalOffer as CouponIcon, Person as PersonIcon } from '@mui/icons-material';
+import CssBaseline from '@mui/material/CssBaseline';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
-// コンポーネントのインポート
-import AIAssistant from './components/AIAssistant';
-import StoreCrowdedness from './components/StoreCrowdedness';
-import Coupons from './components/Coupons';
-import Account from './components/Account';
+import Home from './pages/Home';
+import AIAssistant from './pages/AIAssistant';
+import StoreCrowdedness from './pages/StoreCrowdedness';
+import Coupons from './pages/Coupons';
+import Account from './pages/Account';
+
+const theme = createTheme({
+  // テーマの設定
+});
+
+const queryClient = new QueryClient();
 
 function App() {
-  const [stores, setStores] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [favorites, setFavorites] = useState([]);
-
-  useEffect(() => {
-    const data = db.getAll();
-    setStores(data.stores);
-  }, []);
-
-  const handleAddUser = (user) => {
-    db.addUser(user);
-    setCurrentUser(user);
-  };
-
-  const handleAddFavorite = (userId, storeId) => {
-    db.addFavorite(userId, storeId);
-    setFavorites(db.getUserFavorites(userId));
-  };
-
-  const handleUpdateCrowdedness = (storeId, crowdedness) => {
-    db.updateStoreCrowdedness(storeId, crowdedness);
-    setStores(prevStores => prevStores.map(store => 
-      store.id === storeId ? { ...store, crowdedness } : store
-    ));
-  };
+  const [value, setValue] = React.useState(0);
 
   return (
-    <Router>
-      <div className="app">
-        <nav>
-          <ul>
-            <li><Link to="/">AIアシスタント</Link></li>
-            <li><Link to="/crowdedness">混雑状況</Link></li>
-            <li><Link to="/coupons">クーポン</Link></li>
-            <li><Link to="/account">アカウント</Link></li>
-          </ul>
-        </nav>
-
-        <Routes>
-          <Route path="/" element={<AIAssistant />} />
-          <Route 
-            path="/crowdedness" 
-            element={
-              <StoreCrowdedness 
-                stores={stores} 
-                favorites={favorites}
-                currentUser={currentUser}
-                onUpdateCrowdedness={handleUpdateCrowdedness}
-              />
-            } 
-          />
-          <Route path="/coupons" element={<Coupons />} />
-          <Route 
-            path="/account" 
-            element={
-              <Account 
-                currentUser={currentUser}
-                onAddUser={handleAddUser}
-                stores={stores}
-                onAddFavorite={handleAddFavorite}
-              />
-            } 
-          />
-        </Routes>
-      </div>
-    </Router>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Router>
+          <div style={{ paddingBottom: '56px' }}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/ai-assistant" element={<AIAssistant />} />
+              <Route path="/store-crowdedness" element={<StoreCrowdedness />} />
+              <Route path="/coupons" element={<Coupons />} />
+              <Route path="/account" element={<Account />} />
+            </Routes>
+          </div>
+          <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
+            <BottomNavigation
+              value={value}
+              onChange={(event, newValue) => {
+                setValue(newValue);
+              }}
+              showLabels
+            >
+              <BottomNavigationAction label="ホーム" icon={<HomeIcon />} component={Link} to="/" />
+              <BottomNavigationAction label="AI" icon={<ChatIcon />} component={Link} to="/ai-assistant" />
+              <BottomNavigationAction label="混雑状況" icon={<StoreIcon />} component={Link} to="/store-crowdedness" />
+              <BottomNavigationAction label="クーポン" icon={<CouponIcon />} component={Link} to="/coupons" />
+              <BottomNavigationAction label="アカウント" icon={<PersonIcon />} component={Link} to="/account" />
+            </BottomNavigation>
+          </Paper>
+        </Router>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 

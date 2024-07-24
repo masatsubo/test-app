@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Typography, Container, FormControl, InputLabel, Select, MenuItem, Checkbox, FormGroup, FormControlLabel } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { TextField, Button, Typography, Container, FormControl, InputLabel, Select, MenuItem, Checkbox, FormGroup, FormControlLabel, List, ListItem, ListItemText } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    marginTop: theme.spacing(4),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  form: {
-    width: '100%',
-    marginTop: theme.spacing(1),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
+const StyledContainer = styled(Container)(({ theme }) => ({
+  marginTop: theme.spacing(4),
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+}));
+
+const StyledForm = styled('form')(({ theme }) => ({
+  width: '100%',
+  marginTop: theme.spacing(1),
+}));
+
+const StyledSubmitButton = styled(Button)(({ theme }) => ({
+  margin: theme.spacing(3, 0, 2),
 }));
 
 const stores = [
@@ -25,7 +25,6 @@ const stores = [
 ];
 
 function Account() {
-  const classes = useStyles();
   const [isRegistered, setIsRegistered] = useState(false);
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
@@ -69,36 +68,40 @@ function Account() {
 
   if (isRegistered && userInfo) {
     return (
-      <Container component="main" maxWidth="xs" className={classes.root}>
+      <StyledContainer component="main" maxWidth="xs">
         <Typography component="h1" variant="h5">
           ユーザー情報
         </Typography>
-        <Typography>ユーザーID: {userInfo.userId}</Typography>
-        <Typography>お気に入り店舗:</Typography>
-        <ul>
-          {userInfo.favoriteStores.map((storeId) => (
-            <li key={storeId}>{stores.find(store => store.id === storeId).name}</li>
-          ))}
-        </ul>
-        <Button
+        <List>
+          <ListItem>
+            <ListItemText primary="ユーザーID" secondary={userInfo.userId} />
+          </ListItem>
+          <ListItem>
+            <ListItemText primary="お気に入り店舗" secondary={
+              userInfo.favoriteStores.map(storeId => 
+                stores.find(store => store.id === storeId)?.name
+              ).join(', ')
+            } />
+          </ListItem>
+        </List>
+        <StyledSubmitButton
           fullWidth
           variant="contained"
           color="secondary"
-          className={classes.submit}
           onClick={handleLogout}
         >
           ログアウト
-        </Button>
-      </Container>
+        </StyledSubmitButton>
+      </StyledContainer>
     );
   }
 
   return (
-    <Container component="main" maxWidth="xs" className={classes.root}>
+    <StyledContainer component="main" maxWidth="xs">
       <Typography component="h1" variant="h5">
         {isRegistered ? 'ログイン' : 'アカウント登録'}
       </Typography>
-      <form className={classes.form} onSubmit={isRegistered ? handleLogin : handleRegister}>
+      <StyledForm onSubmit={isRegistered ? handleLogin : handleRegister}>
         <TextField
           variant="outlined"
           margin="normal"
@@ -145,16 +148,15 @@ function Account() {
             </Select>
           </FormControl>
         )}
-        <Button
+        <StyledSubmitButton
           type="submit"
           fullWidth
           variant="contained"
           color="primary"
-          className={classes.submit}
         >
           {isRegistered ? 'ログイン' : '登録'}
-        </Button>
-      </form>
+        </StyledSubmitButton>
+      </StyledForm>
       <Button
         fullWidth
         variant="text"
@@ -163,7 +165,7 @@ function Account() {
       >
         {isRegistered ? 'アカウント登録へ' : 'ログインへ'}
       </Button>
-    </Container>
+    </StyledContainer>
   );
 }
 
