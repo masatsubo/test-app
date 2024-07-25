@@ -5,7 +5,7 @@ function Header() {
     <header className="header">
       <div className="logo-container">
         <img 
-          src={`${process.env.PUBLIC_URL}/images/logo.gif`} 
+          src={`${process.env.PUBLIC_URL}/images/logo1.gif`} 
           alt="角上魚類ロゴ" 
           className="logo-image"
           onError={(e) => {
