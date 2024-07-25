@@ -1,2 +1,0 @@
-# kakujoe
-kakujoe mock-app
