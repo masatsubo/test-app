@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
 import { useCart } from '../contexts/CartContext';
-import { Star, StarHalf, StarOutline } from '@mui/icons-material';
+import { Add, Remove, Star, StarHalf, StarOutline } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
-const cuttingOptions = ['2枚おろし', '3枚おろし', '刺身', 'ドレス'];
-
-function ProductItem({ product, category }) {
-  const [selectedCutting, setSelectedCutting] = useState('');
+function ProductItem({ product, category, selectedCutting }) {
+  const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
+  const navigate = useNavigate();
+
+  if (!product) {
+    return <div>商品情報が見つかりません</div>;
+  }
 
   const handleAddToCart = () => {
-    if (category === '鮮魚' && !selectedCutting) {
-      alert('捌き方を選択してください。');
-      return;
-    }
-    addToCart({ ...product, cutting: selectedCutting, category });
+    addToCart({ ...product, quantity, category, cutting: selectedCutting });
+  };
+
+  const handleCuttingSelection = () => {
+    navigate('/cutting-selection', { state: { productId: product.id } });
   };
 
   const getCategoryFolder = (category) => {
@@ -29,15 +33,15 @@ function ProductItem({ product, category }) {
 
   const renderRating = (rating) => {
     const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
+    const hasHalfStar = rating % 1 >= 0.5;
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
     return (
       <div className="rating">
-        {[...Array(fullStars)].map((_, i) => <Star key={`full-${i}`} />)}
-        {hasHalfStar && <StarHalf />}
-        {[...Array(emptyStars)].map((_, i) => <StarOutline key={`empty-${i}`} />)}
-        <span>({rating})</span>
+        {[...Array(fullStars)].map((_, i) => <Star key={`full-${i}`} className="star" />)}
+        {hasHalfStar && <StarHalf className="star" />}
+        {[...Array(emptyStars)].map((_, i) => <StarOutline key={`empty-${i}`} className="star" />)}
+        <span className="rating-number">{rating.toFixed(1)}</span>
       </div>
     );
   };
@@ -54,16 +58,20 @@ function ProductItem({ product, category }) {
       />
       <div className="product-info">
         <h3>{product.name}</h3>
-        <p className="price">¥{product.price}</p>
+        <p className="price">¥{product.price.toLocaleString()}</p>
         <p className="description">{product.description}</p>
         {renderRating(product.rating)}
+        <div className="quantity-selector">
+          <button onClick={() => setQuantity(Math.max(1, quantity - 1))}><Remove /></button>
+          <span>{quantity}</span>
+          <button onClick={() => setQuantity(quantity + 1)}><Add /></button>
+        </div>
         {category === '鮮魚' && (
-          <select value={selectedCutting} onChange={(e) => setSelectedCutting(e.target.value)}>
-            <option value="">捌き方を選択</option>
-            {cuttingOptions.map(option => (
-              <option key={option} value={option}>{option}</option>
-            ))}
-          </select>
+          selectedCutting ? (
+            <p className="selected-cutting">選択された捌き方: {selectedCutting}</p>
+          ) : (
+            <button onClick={handleCuttingSelection} className="cutting-selection-btn">捌き方を選択</button>
+          )
         )}
         <button onClick={handleAddToCart} className="add-to-cart-btn">カートに追加</button>
       </div>

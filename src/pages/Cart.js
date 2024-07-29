@@ -20,7 +20,7 @@ function Cart() {
   const total = subtotal + tax;
 
   const handleCheckout = () => {
-    const hasFreshFish = cart.some(item => item.category === '鮮魚');
+    const hasFreshFish = cart.some(item => item.category === '鮮魚' && !item.cutting);
     if (hasFreshFish) {
       navigate('/cutting-selection');
     } else {
