@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 function ProductItem({ product, category }) {
   const [quantity, setQuantity] = useState(1);
+  const [showPopup, setShowPopup] = useState(false);
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
@@ -17,6 +18,8 @@ function ProductItem({ product, category }) {
       navigate('/cutting-selection', { state: { product: { ...product, quantity, category } } });
     } else {
       addToCart({ ...product, quantity, category });
+      setShowPopup(true);
+      setTimeout(() => setShowPopup(false), 2000);
     }
   };
 
@@ -70,6 +73,11 @@ function ProductItem({ product, category }) {
           {category === '鮮魚' ? '捌き方を選択' : 'カートに追加'}
         </button>
       </div>
+      {showPopup && (
+        <div className="popup">
+          <p>カートに追加しました</p>
+        </div>
+      )}
     </div>
   );
 }

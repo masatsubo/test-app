@@ -24,6 +24,15 @@ function Checkout() {
     navigate('/order-complete');
   };
 
+  const getCategoryFolder = (category) => {
+    switch(category) {
+      case '寿司': return 'sushi';
+      case '鮮魚': return 'fish';
+      case '惣菜': return 'side_dish';
+      default: return '';
+    }
+  };
+
   return (
     <div className="checkout">
       <h2>注文確認</h2>
@@ -31,7 +40,14 @@ function Checkout() {
         <h3>注文内容</h3>
         {cart.map(item => (
           <div key={item.id} className="cart-item">
-            <img src={`${process.env.PUBLIC_URL}/images/${item.category}/${item.image}`} alt={item.name} />
+            <img 
+              src={`${process.env.PUBLIC_URL}/images/${getCategoryFolder(item.category)}/${item.image}`} 
+              alt={item.name}
+              onError={(e) => {
+                console.error(`Failed to load image: ${e.target.src}`);
+                e.target.src = `${process.env.PUBLIC_URL}/images/placeholder.png`;
+              }}
+            />
             <div className="item-details">
               <h4>{item.name}</h4>
               <p>価格: ¥{item.price.toLocaleString()} × {item.quantity}</p>
