@@ -3,7 +3,7 @@ import { useCart } from '../contexts/CartContext';
 import { Add, Remove, Star, StarHalf, StarOutline } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
-function ProductItem({ product, category, selectedCutting }) {
+function ProductItem({ product, category }) {
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
   const navigate = useNavigate();
@@ -13,11 +13,11 @@ function ProductItem({ product, category, selectedCutting }) {
   }
 
   const handleAddToCart = () => {
-    addToCart({ ...product, quantity, category, cutting: selectedCutting });
-  };
-
-  const handleCuttingSelection = () => {
-    navigate('/cutting-selection', { state: { productId: product.id } });
+    if (category === '鮮魚') {
+      navigate('/cutting-selection', { state: { product: { ...product, quantity, category } } });
+    } else {
+      addToCart({ ...product, quantity, category });
+    }
   };
 
   const getCategoryFolder = (category) => {
@@ -66,14 +66,9 @@ function ProductItem({ product, category, selectedCutting }) {
           <span>{quantity}</span>
           <button onClick={() => setQuantity(quantity + 1)}><Add /></button>
         </div>
-        {category === '鮮魚' && (
-          selectedCutting ? (
-            <p className="selected-cutting">選択された捌き方: {selectedCutting}</p>
-          ) : (
-            <button onClick={handleCuttingSelection} className="cutting-selection-btn">捌き方を選択</button>
-          )
-        )}
-        <button onClick={handleAddToCart} className="add-to-cart-btn">カートに追加</button>
+        <button onClick={handleAddToCart} className="add-to-cart-btn">
+          {category === '鮮魚' ? '捌き方を選択' : 'カートに追加'}
+        </button>
       </div>
     </div>
   );

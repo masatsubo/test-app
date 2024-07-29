@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useCart } from '../contexts/CartContext';
 
 const cuttingOptions = [
   { id: 'nimai', name: '二枚下ろし', image: 'nimai.jpg', description: '魚を、半身に背骨がついたままの状態のものと、もう一方の半身の2枚の状態にすること。焼き魚や煮魚に' },
@@ -10,22 +11,24 @@ const cuttingOptions = [
 
 function CuttingSelection() {
   const [selectedCutting, setSelectedCutting] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { productId } = location.state || {};
+  const { addToCart } = useCart();
+  const { product } = location.state || {};
 
   const handleCuttingSelect = (cuttingOption) => {
     setSelectedCutting(cuttingOption);
   };
 
-  const handleSubmit = () => {
-    if (selectedCutting) {
-      navigate('/products', { 
-        state: { 
-          selectedCutting: selectedCutting.name, 
-          productId 
-        }
-      });
+  const handleAddToCart = () => {
+    if (selectedCutting && product) {
+      addToCart({ ...product, cutting: selectedCutting.name });
+      setShowPopup(true);
+      setTimeout(() => {
+        setShowPopup(false);
+        navigate('/products');
+      }, 2000);
     }
   };
 
@@ -43,16 +46,28 @@ function CuttingSelection() {
                 checked={selectedCutting?.id === option.id}
                 onChange={() => handleCuttingSelect(option)}
               />
-              <img src={`${process.env.PUBLIC_URL}/images/cutting/${option.image}`} alt={option.name} />
+              <img 
+                src={`${process.env.PUBLIC_URL}/images/cutting/${option.image}`} 
+                alt={option.name}
+                onError={(e) => {
+                  console.error(`Failed to load image: ${e.target.src}`);
+                  e.target.src = `${process.env.PUBLIC_URL}/images/placeholder.png`;
+                }}
+              />
               <h3>{option.name}</h3>
               <p>{option.description}</p>
             </label>
           </div>
         ))}
       </div>
-      <button onClick={handleSubmit} className="submit-btn" disabled={!selectedCutting}>
-        決定
+      <button onClick={handleAddToCart} className="add-to-cart-btn" disabled={!selectedCutting}>
+        カートに入れる
       </button>
+      {showPopup && (
+        <div className="popup">
+          <p>商品がカートに入りました</p>
+        </div>
+      )}
     </div>
   );
 }
